@@ -218,3 +218,71 @@ if (btnCopyData) {
 }
 
 window.onload = initMediaPipe;
+
+// Función para entrenar pegando el texto directamente
+async function trainFromText() {
+    const rawText = document.getElementById('jsonPasteInput').value.trim();
+    if (!rawText) {
+        alert("Por favor pega el texto grabado en el cuadro blanco primero.");
+        return;
+    }
+
+    if (statusDiv) statusDiv.innerText = "Procesando datos pegados...";
+
+    try {
+        const rawData = JSON.parse(rawText);
+        let inputs = [];
+        let outputs = [];
+        labels = [...new Set(rawData.map(item => item.label))];
+
+        rawData.forEach(item => {
+            const labelIndex = labels.indexOf(item.label);
+            item.frames.forEach(frame => {
+                if (frame.length === 63) {
+                    inputs.push(frame);
+                    outputs.push(labelIndex);
+                }
+            });
+        });
+
+        if (inputs.length === 0) {
+            alert("No se encontraron fotogramas válidos en el texto.");
+            return;
+        }
+
+        const xs = tf.tensor2d(inputs);
+        const ys = tf.oneHot(tf.tensor1d(outputs, 'int32'), labels.length);
+
+        model = tf.sequential();
+        model.add(tf.layers.dense({ units: 64, activation: 'relu', inputShape: [63] }));
+        model.add(tf.layers.dense({ units: 32, activation: 'relu' }));
+        model.add(tf.layers.dense({ units: labels.length, activation: 'softmax' }));
+
+        model.compile({
+            optimizer: 'adam',
+            loss: 'categoricalCrossentropy',
+            metrics: ['accuracy']
+        });
+
+        if (statusDiv) statusDiv.innerText = "Entrenando IA... Por favor espera unos segundos.";
+
+        await model.fit(xs, ys, {
+            epochs: 30,
+            callbacks: {
+                onEpochEnd: (epoch, logs) => {
+                    if (statusDiv) statusDiv.innerText = `Entrenando IA... Época ${epoch + 1}/30 - Precisión: ${Math.round(logs.acc * 100)}%`;
+                }
+            }
+        });
+
+        xs.dispose();
+        ys.dispose();
+
+        if (statusDiv) statusDiv.innerText = `¡Entrenamiento completo! Haz la seña frente a la cámara.`;
+        alert("¡IA entrenada con éxito! Ahora prueba hacer la seña.");
+
+    } catch (err) {
+        console.error(err);
+        alert("El texto pegado sigue estando incompleto. Asegúrate de copiar desde el inicio '[' hasta el final ']' en Google Docs.");
+    }
+}
