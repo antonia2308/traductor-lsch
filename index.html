@@ -10,7 +10,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
 
-  <!-- TensorFlow.js para la Red Neuronal -->
+  <!-- TensorFlow.js -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
 
   <link rel="stylesheet" href="style.css" />
@@ -28,15 +28,17 @@
     </div>
 
     <div class="status-card">
-      <div class="letter-detected" id="statusText">Carga tu archivo JSON para entrenar</div>
-      <small id="subStatus">Haz clic en "Cargar Datos y Entrenar IA"</small>
+      <div class="letter-detected" id="statusText">Pega tus datos abajo para entrenar la IA</div>
+      <small id="subStatus">Copia el texto grabado y pégalo en el cuadro</small>
     </div>
 
     <div class="speller-box" id="spellerText"></div>
 
-    <div class="trainer-box">
-     <input type="file" id="jsonInput" accept=".json,.txt" style="display: none;" onchange="loadAndTrain(event)" />
-      <button class="btn btn-audio" onclick="document.getElementById('jsonInput').click()">📂 Cargar Datos y Entrenar IA</button>
+    <!-- Área de pegado directo -->
+    <div class="trainer-box" style="margin: 15px 0;">
+      <textarea id="jsonPasteInput" placeholder="Pega aquí todo el texto grabado..." style="width: 90%; height: 80px; padding: 10px; font-size: 12px; border-radius: 8px; border: 1px solid #ccc;"></textarea>
+      <br>
+      <button class="btn btn-audio" onclick="trainFromText()" style="margin-top: 8px; background-color: #ffc107; color: #000; font-weight: bold;">⚡ Entrenar IA Directamente</button>
     </div>
 
     <div class="controls" style="margin-top: 10px;">
