@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Traductor LSCh - IA Entrenada</title>
+  
+  <!-- MediaPipe -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js" crossorigin="anonymous"></script>
+
+  <!-- TensorFlow.js para la Red Neuronal -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header>
+    <h1>Traductor LSCh - IA Multimodal</h1>
+  </header>
+
+  <div id="view-translator" class="view active">
+    <div class="viewport">
+      <video id="webcam" playsinline></video>
+      <canvas id="output_canvas"></canvas>
+    </div>
+
+    <div class="status-card">
+      <div class="letter-detected" id="statusText">Carga tus datos para entrenar</div>
+      <small id="subStatus">Haz clic en "Cargar Datos y Entrenar IA"</small>
+    </div>
+
+    <div class="speller-box" id="spellerText"></div>
+
+    <div class="trainer-box">
+      <input type="file" id="jsonInput" accept=".json" style="display: none;" onchange="loadAndTrain(event)" />
+      <button class="btn btn-audio" onclick="document.getElementById('jsonInput').click()">📂 Cargar Datos y Entrenar IA</button>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-audio" id="btnSpeak">🔊 Audio</button>
+      <button class="btn btn-clear" id="btnClear">Borrar</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
