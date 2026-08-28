@@ -28,28 +28,23 @@
     </div>
 
     <div class="status-card">
-      <div class="letter-detected" id="statusText">Pega tus datos abajo para entrenar la IA</div>
-      <small id="subStatus">Copia el texto grabado y pégalo en el cuadro</small>
+      <div class="letter-detected" id="statusText">Escribe el nombre de la seña y presiona Grabar</div>
     </div>
 
     <div class="speller-box" id="spellerText"></div>
 
-    <!-- Área de pegado directo -->
-    <div class="trainer-box" style="margin: 15px 0;">
-      <textarea id="jsonPasteInput" placeholder="Pega aquí todo el texto grabado..." style="width: 90%; height: 80px; padding: 10px; font-size: 12px; border-radius: 8px; border: 1px solid #ccc;"></textarea>
-      <br>
-      <button class="btn btn-audio" onclick="trainFromText()" style="margin-top: 8px; background-color: #ffc107; color: #000; font-weight: bold;">⚡ Entrenar IA Directamente</button>
+    <div class="controls" style="margin-top: 15px;">
+      <input type="text" id="labelInput" placeholder="Nombre de la seña (ej: hola)" style="padding: 10px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; width: 60%;">
+      <button class="btn" id="btnRecord" style="background-color: #dc3545; color: white; margin-top: 5px;">🔴 Grabar Seña (10s)</button>
     </div>
 
-    <div class="controls" style="margin-top: 10px;">
-      <input type="text" id="labelInput" placeholder="Nombre de la seña (ej: hola)" style="padding: 10px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-right: 5px;">
-      <button class="btn" id="btnRecord" style="background-color: #28a745; color: white;">🔴 Grabar Seña (10s)</button>
-      <button class="btn" id="btnCopyData">📋 Copiar Datos Grabados</button>
+    <div class="controls" style="margin-top: 15px;">
+      <button class="btn" onclick="trainDirectly()" style="background-color: #ffc107; color: #000; font-weight: bold; width: 90%; padding: 12px;">⚡ ENTRENAR IA CON SEÑAS GRABADAS</button>
     </div>
 
-    <div class="controls" style="margin-top: 10px;">
+    <div class="controls" style="margin-top: 15px;">
       <button class="btn btn-audio" id="btnSpeak">🔊 Audio</button>
-      <button class="btn btn-clear" id="btnClear">Borrar</button>
+      <button class="btn btn-clear" id="btnClear">Borrar Texto</button>
     </div>
   </div>
 
