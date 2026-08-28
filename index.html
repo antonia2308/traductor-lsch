@@ -46,6 +46,13 @@
       <button class="btn btn-audio" id="btnSpeak">🔊 Audio</button>
       <button class="btn btn-clear" id="btnClear">Borrar Texto</button>
     </div>
+
+    <!-- Botones para guardar y cargar modelo -->
+    <div class="controls" style="margin-top: 15px; display: flex; gap: 10px; justify-content: center;">
+      <button class="btn" id="btnSaveModel" style="background-color: #2196F3; color: white; width: 45%;">💾 Guardar Modelo</button>
+      <input type="file" id="loadModelInput" multiple style="display: none;" accept=".json,.bin">
+      <button class="btn" id="btnLoadModel" style="background-color: #9C27B0; color: white; width: 45%;">📁 Cargar Modelo</button>
+    </div>
   </div>
 
   <script src="app.js"></script>
