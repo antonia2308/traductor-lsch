@@ -28,21 +28,21 @@
     </div>
 
     <div class="status-card">
-      <div class="letter-detected" id="status">Iniciando cámara y modelo...</div>
-      <small id="subStatus">Escribe el nombre de la seña abajo para empezar a grabar</small>
+      <div class="letter-detected" id="statusText">Carga tu archivo JSON para entrenar</div>
+      <small id="subStatus">Haz clic en "Cargar Datos y Entrenar IA"</small>
     </div>
 
     <div class="speller-box" id="spellerText"></div>
 
-    <div class="controls" style="margin-bottom: 10px;">
-      <input type="text" id="labelInput" placeholder="Nombre de la seña (ej: hola)" style="padding: 10px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-right: 5px;">
-      <button class="btn" id="btnRecord" style="background-color: #28a745; color: white;">🔴 Grabar Seña (10s)</button>
-      <button class="btn" id="btnCopyData">📋 Copiar Datos Grabados</button>
-    </div>
-
     <div class="trainer-box">
       <input type="file" id="jsonInput" accept=".json" style="display: none;" onchange="loadAndTrain(event)" />
       <button class="btn btn-audio" onclick="document.getElementById('jsonInput').click()">📂 Cargar Datos y Entrenar IA</button>
+    </div>
+
+    <div class="controls" style="margin-top: 10px;">
+      <input type="text" id="labelInput" placeholder="Nombre de la seña (ej: hola)" style="padding: 10px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-right: 5px;">
+      <button class="btn" id="btnRecord" style="background-color: #28a745; color: white;">🔴 Grabar Seña (10s)</button>
+      <button class="btn" id="btnCopyData">📋 Copiar Datos Grabados</button>
     </div>
 
     <div class="controls" style="margin-top: 10px;">
