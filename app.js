@@ -13,20 +13,20 @@ const canvasCtx = canvasElement.getContext('2d');
 const statusDiv = document.getElementById('statusText');
 const spellerDiv = document.getElementById('spellerText');
 
-// Configuración de MediaPipe Holistic
+// Configuración de MediaPipe Holistic (con puntos y líneas finas)
 function onResults(results) {
     canvasCtx.save();
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
     canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
-    // Dibujar Landmarks de las manos si existen
+    // Dibujar Landmarks de las manos con trazos finos
     if (results.rightHandLandmarks) {
-        drawConnectors(canvasCtx, results.rightHandLandmarks, HAND_CONNECTIONS, { color: '#00FF00', lineWidth: 2 });
-        drawLandmarks(canvasCtx, results.rightHandLandmarks, { color: '#FF0000', lineWidth: 1 });
+        drawConnectors(canvasCtx, results.rightHandLandmarks, HAND_CONNECTIONS, { color: '#00FF00', lineWidth: 1.5 });
+        drawLandmarks(canvasCtx, results.rightHandLandmarks, { color: '#FF0000', lineWidth: 1, radius: 2 });
     }
     if (results.leftHandLandmarks) {
-        drawConnectors(canvasCtx, results.leftHandLandmarks, HAND_CONNECTIONS, { color: '#00FF00', lineWidth: 2 });
-        drawLandmarks(canvasCtx, results.leftHandLandmarks, { color: '#FF0000', lineWidth: 1 });
+        drawConnectors(canvasCtx, results.leftHandLandmarks, HAND_CONNECTIONS, { color: '#00FF00', lineWidth: 1.5 });
+        drawLandmarks(canvasCtx, results.leftHandLandmarks, { color: '#FF0000', lineWidth: 1, radius: 2 });
     }
     canvasCtx.restore();
 
@@ -60,10 +60,7 @@ function onResults(results) {
                     
                     if (scores[maxScoreIndex] > 0.75) {
                         const detected = labels[maxScoreIndex];
-                        if (statusDiv) statusDiv.innerText = `Seña: ${detected}`;
-                        if (spellerDiv && !spellerDiv.innerText.endsWith(detected)) {
-                            spellerDiv.innerText += " " + detected;
-                        }
+                        if (statusDiv) statusDiv.innerText = `Seña detectada: ${detected.toUpperCase()}`;
                     }
                 });
             }
