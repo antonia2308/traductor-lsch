@@ -17,14 +17,15 @@ const btnPredict = document.getElementById('btnPredict');
 const btnCopyData = document.getElementById('btnCopyData');
 const statusDiv = document.getElementById('status');
 
-// Inicializar MediaPipe Holistic
+// Inicializar MediaPipe Holistic optimizado para tablet
 function initMediaPipe() {
     holistic = new Holistic({
         locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`
     });
 
+    // modelComplexity: 0 hace que procese mucho más rápido en dispositivos móviles
     holistic.setOptions({
-        modelComplexity: 1,
+        modelComplexity: 0,
         smoothLandmarks: true,
         minDetectionConfidence: 0.5,
         minTrackingConfidence: 0.5
@@ -40,7 +41,7 @@ function initMediaPipe() {
         height: 480
     });
     camera.start();
-    statusDiv.innerText = "Estado: Cámara lista. Lista para grabar o predecir.";
+    if (statusDiv) statusDiv.innerText = "Estado: Cámara lista. Lista para grabar o predecir.";
 }
 
 // Extraer los 21 puntos clave de la mano derecha o izquierda
@@ -56,23 +57,23 @@ function extractHandFeatures(results) {
         features.push(pt.y - wrist.y);
         features.push(pt.z - wrist.z);
     }
-    return features; // Devuelve un arreglo de 63 números (21 puntos x 3 ejes)
+    return features;
 }
 
-// Procesar cada fotograma de la cámara
+// Procesar cada fotograma de la cámara con puntos más finos
 function onResults(results) {
     canvasCtx.save();
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
     canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
-    // Dibujar manos si existen
+    // Dibujar manos con puntos delgados (radius: 2)
     if (results.rightHandLandmarks) {
-        drawConnectors(canvasCtx, results.rightHandLandmarks, HAND_CONNECTIONS, {color: '#00FF00', lineWidth: 2});
-        drawLandmarks(canvasCtx, results.rightHandLandmarks, {color: '#FF0000', lineWidth: 1});
+        drawConnectors(canvasCtx, results.rightHandLandmarks, HAND_CONNECTIONS, {color: '#00FF00', lineWidth: 1.5});
+        drawLandmarks(canvasCtx, results.rightHandLandmarks, {color: '#FF0000', lineWidth: 1, radius: 2});
     }
     if (results.leftHandLandmarks) {
-        drawConnectors(canvasCtx, results.leftHandLandmarks, HAND_CONNECTIONS, {color: '#00FF00', lineWidth: 2});
-        drawLandmarks(canvasCtx, results.leftHandLandmarks, {color: '#FF0000', lineWidth: 1});
+        drawConnectors(canvasCtx, results.leftHandLandmarks, HAND_CONNECTIONS, {color: '#00FF00', lineWidth: 1.5});
+        drawLandmarks(canvasCtx, results.leftHandLandmarks, {color: '#FF0000', lineWidth: 1, radius: 2});
     }
     canvasCtx.restore();
 
@@ -86,39 +87,40 @@ function onResults(results) {
 }
 
 // Lógica para Grabar Muestras (10 Segundos)
-btnRecord.addEventListener('click', () => {
-    const label = labelInput.value.trim().toLowerCase();
-    if (!label) {
-        alert("Por favor, ingresa el nombre de la seña (ejemplo: hola)");
-        return;
-    }
-
-    recordedFrames = [];
-    isRecording = true;
-    btnRecord.disabled = true;
-    
-    let countdown = 10;
-    statusDiv.innerText = `Grabando seña "${label}"... Repite el gesto continuamente! (${countdown}s)`;
-
-    let timer = setInterval(() => {
-        countdown--;
-        if (countdown > 0) {
-            statusDiv.innerText = `Grabando seña "${label}"... Repite el gesto continuamente! (${countdown}s)`;
-        } else {
-            clearInterval(timer);
-            isRecording = false;
-            btnRecord.disabled = false;
-
-            if (recordedFrames.length > 0) {
-                // Guardar la secuencia completa grabada
-                dataset.push({ label: label, frames: recordedFrames });
-                statusDiv.innerText = `¡Grabación finalizada! Capturados ${recordedFrames.length} fotogramas para "${label}". Muestras totales: ${dataset.length}`;
-            } else {
-                statusDiv.innerText = "No se detectó ninguna mano durante la grabación. Intenta de nuevo.";
-            }
+if (btnRecord) {
+    btnRecord.addEventListener('click', () => {
+        const label = labelInput ? labelInput.value.trim().toLowerCase() : '';
+        if (!label) {
+            alert("Por favor, ingresa el nombre de la seña (ejemplo: hola)");
+            return;
         }
-    }, 1000);
-});
+
+        recordedFrames = [];
+        isRecording = true;
+        btnRecord.disabled = true;
+        
+        let countdown = 10;
+        if (statusDiv) statusDiv.innerText = `Grabando seña "${label}"... Repite el gesto continuamente! (${countdown}s)`;
+
+        let timer = setInterval(() => {
+            countdown--;
+            if (countdown > 0) {
+                if (statusDiv) statusDiv.innerText = `Grabando seña "${label}"... Repite el gesto continuamente! (${countdown}s)`;
+            } else {
+                clearInterval(timer);
+                isRecording = false;
+                btnRecord.disabled = false;
+
+                if (recordedFrames.length > 0) {
+                    dataset.push({ label: label, frames: recordedFrames });
+                    if (statusDiv) statusDiv.innerText = `¡Grabación finalizada! Capturados ${recordedFrames.length} fotogramas para "${label}". Muestras totales: ${dataset.length}`;
+                } else {
+                    if (statusDiv) statusDiv.innerText = "No se detectó ninguna mano durante la grabación. Intenta de nuevo.";
+                }
+            }
+        }, 1000);
+    });
+}
 
 // Botón para Copiar Datos al Portapapeles (Solución Tablet)
 if (btnCopyData) {
@@ -132,7 +134,7 @@ if (btnCopyData) {
             alert("¡Datos copiados al portapapeles con éxito! Puedes pegarlos donde quieras.");
         }).catch(err => {
             console.error("Error al copiar: ", err);
-            alert("No se pudo copiar automáticamente. Revisa la consola.");
+            alert("No se pudo copiar automáticamente.");
         });
     });
 }
