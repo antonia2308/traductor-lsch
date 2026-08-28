@@ -39,13 +39,12 @@ function onResults(results) {
                 frame.push(lm.x, lm.y, lm.z);
             });
             if (frame.length === 63) {
-                // Guardar en la última seña agregada
                 recordedData[recordedData.length - 1].frames.push(frame);
             }
         }
     }
 
-    // Predicción en vivo si el modelo ya está entrenado
+    // Predicción en vivo si el modelo ya está cargado o entrenado
     if (model && !isRecording) {
         let hand = results.rightHandLandmarks || results.leftHandLandmarks;
         if (hand) {
@@ -92,7 +91,7 @@ camera = new Camera(videoElement, {
 });
 camera.start();
 
-// Eventos de Botones
+// Eventos de Botones de Grabación
 document.getElementById('btnRecord').addEventListener('click', () => {
     const labelInput = document.getElementById('labelInput').value.trim();
     if (!labelInput) {
@@ -102,7 +101,6 @@ document.getElementById('btnRecord').addEventListener('click', () => {
 
     currentLabel = labelInput.toLowerCase();
     
-    // Crear nueva entrada para esta grabación
     recordedData.push({
         label: currentLabel,
         frames: []
@@ -126,7 +124,7 @@ document.getElementById('btnRecord').addEventListener('click', () => {
     }, 1000);
 });
 
-// Función para Entrenar la IA directamente con los datos acumulados en memoria
+// Función para Entrenar la IA directamente
 async function trainDirectly() {
     if (recordedData.length === 0) {
         alert("Primero debes hacer al menos 1 grabación de una seña.");
@@ -194,7 +192,7 @@ async function trainDirectly() {
 
 // Botones de voz y borrar
 document.getElementById('btnSpeak').addEventListener('click', () => {
-    const text = spellerDiv ? spellerDiv.innerText : "";
+    const text = statusDiv ? statusDiv.innerText.replace('Seña detectada: ', '') : "";
     if (text) {
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'es-CL';
@@ -205,4 +203,45 @@ document.getElementById('btnSpeak').addEventListener('click', () => {
 document.getElementById('btnClear').addEventListener('click', () => {
     if (spellerDiv) spellerDiv.innerText = "";
     if (statusDiv) statusDiv.innerText = "Texto borrado.";
+});
+
+// Guardar el modelo en la tablet
+document.getElementById('btnSaveModel').addEventListener('click', async () => {
+    if (!model) {
+        alert("Primero debes entrenar la IA antes de poder guardarla.");
+        return;
+    }
+    await model.save('downloads://modelo-lsch');
+    localStorage.setItem('lsch_labels', JSON.stringify(labels));
+    alert("¡Modelo guardado exitosamente en tus descargas!");
+});
+
+// Cargar el modelo guardado desde la tablet
+document.getElementById('btnLoadModel').addEventListener('click', () => {
+    document.getElementById('loadModelInput').click();
+});
+
+document.getElementById('loadModelInput').addEventListener('change', async (event) => {
+    const files = event.target.files;
+    if (files.length < 2) {
+        alert("Debes seleccionar AMBOS archivos descargados (.json y .bin) al mismo tiempo.");
+        return;
+    }
+
+    try {
+        if (statusDiv) statusDiv.innerText = "Cargando modelo guardado...";
+        
+        model = await tf.loadLayersModel(tf.io.browserFiles([files[0], files[1]]));
+        
+        const savedLabels = localStorage.getItem('lsch_labels');
+        if (savedLabels) {
+            labels = JSON.parse(savedLabels);
+        }
+
+        if (statusDiv) statusDiv.innerText = "¡Modelo cargado con éxito! Listo para reconocer señas.";
+        alert("¡IA restaurada! Señas listas para reconocer.");
+    } catch (err) {
+        console.error(err);
+        alert("Error al cargar el modelo: " + err.message);
+    }
 });
